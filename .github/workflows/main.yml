@@ -20,16 +20,18 @@ jobs:
 
       - name: Build for iOS Simulator (.app)
         run: |
-          xcodebuild -project laith_ios/laith_ios.xcodeproj \
-                     -scheme Laith \
-                     -sdk iphonesimulator \
-                     -configuration Debug \
-                     -derivedDataPath build
+          cd laith_ios
+          # Si vous utilisez xcodebuild avec un espace de travail ou un projet standard
+          if [ -d "*.xcworkspace" ]; then
+            xcodebuild -workspace *.xcworkspace -scheme Laith -sdk iphonesimulator -configuration Debug -derivedDataPath ../build
+          else
+            xcodebuild -project *.xcodeproj -scheme Laith -sdk iphonesimulator -configuration Debug -derivedDataPath ../build
+          fi
 
       - name: Compress .app to .zip for Appetize.io
         run: |
           cd build/Build/Products/Debug-iphonesimulator
-          zip -r Laith_Simulator.app.zip Laith.app
+          zip -r Laith_Simulator.app.zip *.app
 
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v4
