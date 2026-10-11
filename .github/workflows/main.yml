@@ -18,15 +18,20 @@ jobs:
         with:
           xcode-version: latest-stable
 
+      - name: Install XcodeGen and Generate Xcode Project
+        run: |
+          brew install xcodegen
+          cd laith_ios
+          xcodegen generate
+
       - name: Build for iOS Simulator (.app)
         run: |
           cd laith_ios
-          # Si vous utilisez xcodebuild avec un espace de travail ou un projet standard
-          if [ -d "*.xcworkspace" ]; then
-            xcodebuild -workspace *.xcworkspace -scheme Laith -sdk iphonesimulator -configuration Debug -derivedDataPath ../build
-          else
-            xcodebuild -project *.xcodeproj -scheme Laith -sdk iphonesimulator -configuration Debug -derivedDataPath ../build
-          fi
+          xcodebuild -project Laith.xcodeproj \
+                     -scheme Laith \
+                     -sdk iphonesimulator \
+                     -configuration Debug \
+                     -derivedDataPath ../build
 
       - name: Compress .app to .zip for Appetize.io
         run: |
