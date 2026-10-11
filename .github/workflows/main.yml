@@ -1,0 +1,38 @@
+name: Build iOS App (.app / .zip)
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
+      - name: Build for iOS Simulator (.app)
+        run: |
+          xcodebuild -project laith_ios/laith_ios.xcodeproj \
+                     -scheme Laith \
+                     -sdk iphonesimulator \
+                     -configuration Debug \
+                     -derivedDataPath build
+
+      - name: Compress .app to .zip for Appetize.io
+        run: |
+          cd build/Build/Products/Debug-iphonesimulator
+          zip -r Laith_Simulator.app.zip Laith.app
+
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Laith_Simulator_App
+          path: build/Build/Products/Debug-iphonesimulator/Laith_Simulator.app.zip
