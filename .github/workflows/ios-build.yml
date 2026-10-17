@@ -24,8 +24,11 @@ jobs:
     - name: Build iOS App
       run: |
         cd laith_ios
+        # Détection automatique du nom du scheme
+        SCHEME=$(xcodebuild -list -project *.xcodeproj | grep -A 10 "Schemes:" | tail -n +2 | xargs | awk '{print $1}')
+        echo "Building scheme: $SCHEME"
         xcodebuild -project *.xcodeproj \
-                   -scheme feel_issik \
+                   -scheme "$SCHEME" \
                    -sdk iphoneos \
                    -configuration Release \
                    CODE_SIGNING_ALLOWED=NO \
