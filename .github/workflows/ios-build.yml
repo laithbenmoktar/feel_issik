@@ -1,0 +1,40 @@
+name: Build iOS App
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-14
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Xcode
+      uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: 'latest-stable'
+
+    - name: Build iOS App
+      run: |
+        xcodebuild -project laith_ios/laith_ios.xcodeproj \
+                   -scheme laith_ios \
+                   -sdk iphoneos \
+                   -configuration Release \
+                   CODE_SIGNING_ALLOWED=NO \
+                   BUILD_DIR=build
+
+    - name: Package IPA
+      run: |
+        mkdir -p build/Payload
+        mv build/Release-iphoneos/*.app build/Payload/
+        cd build && zip -r laith_ios.ipa Payload
+
+    - name: Upload IPA Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ios-app-ipa
+        path: build/laith_ios.ipa
